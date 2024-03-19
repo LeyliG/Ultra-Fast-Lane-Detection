@@ -4,3 +4,4 @@ tensorboard
 addict
 scikit-learn
 pathspec
+ipykernel

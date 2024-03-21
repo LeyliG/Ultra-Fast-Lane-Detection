@@ -35,6 +35,9 @@ def draw(im,line,idx,show = False):
     for i in range(len(line_x)-1):
         cv2.line(im,pt0,(int(line_x[i+1]),int(line_y[i+1])),(idx,),thickness = 16)
         pt0 = (int(line_x[i+1]),int(line_y[i+1]))
+
+# fixing the error: json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 738 (char 737)
+# function takes in root directory and list of annotation file names within the directory                
 def get_tusimple_list(root, label_list):
     '''
     Get all the files' names from the json annotation
@@ -42,7 +45,19 @@ def get_tusimple_list(root, label_list):
     label_json_all = []
     for l in label_list:
         l = os.path.join(root,l)
-        label_json = [json.loads(line) for line in open(l).readlines()]
+        # read each line of the file and parses each line as JSON
+   ##     label_json = [json.loads(line) for line in open(l).readlines()]    
+        label_json = []
+        with open(l, 'r') as file:
+            for line in file:
+                try:
+                    parsed_line = json.loads(line)
+                    label_json.append(parsed_line)
+                except json.JSONDecodeError:
+                    print(f"Could not parse line as JSON: {line}")
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")  
+        # aggregate the JSON objects into the list
         label_json_all += label_json
     names = [l['raw_file'] for l in label_json_all]
     h_samples = [np.array(l['h_samples']) for l in label_json_all]

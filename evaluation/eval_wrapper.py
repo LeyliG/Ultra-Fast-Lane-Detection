@@ -161,6 +161,25 @@ def eval_lane(net, dataset, data_root, work_dir, griding_num, use_aux, distribut
             for r in res:
                 dist_print(r['name'], r['value'])
         synchronize()
+# add Curvelanes eval        
+    elif dataset == 'CurveLanes':
+        run_test(net,data_root, 'curvelanes_eval_tmp', work_dir, griding_num, use_aux, distributed)
+        synchronize()   # wait for all results
+        if is_main_process():
+            res = call_curvelane_eval(data_root, 'curvelanes_eval_tmp', work_dir)
+            TP,FP,FN = 0,0,0
+            for k, v in res.items():
+                val = float(v['Fmeasure']) if 'nan' not in v['Fmeasure'] else 0
+                val_tp,val_fp,val_fn = int(v['tp']),int(v['fp']),int(v['fn'])
+                TP += val_tp
+                FP += val_fp
+                FN += val_fn
+                dist_print(k,val)
+            P = TP * 1.0/(TP + FP)
+            R = TP * 1.0/(TP + FN)
+            F = 2*P*R/(P + R)
+            dist_print(F)
+        synchronize()
 
 
 def read_helper(path):

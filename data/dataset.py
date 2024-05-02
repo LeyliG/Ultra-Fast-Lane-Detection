@@ -15,6 +15,7 @@ class LaneTestDataset(torch.utils.data.Dataset):
     def __init__(self, path, list_path, img_transform=None):
         super(LaneTestDataset, self).__init__()
         self.path = path
+        #self.crop_size = crop_size
         self.img_transform = img_transform
         with open(list_path, 'r') as f:
             self.list = f.readlines()
@@ -28,6 +29,7 @@ class LaneTestDataset(torch.utils.data.Dataset):
 
         if self.img_transform is not None:
             img = self.img_transform(img)
+        #img = img[:,-self.crop_size:,:]
 
         return img, name
 

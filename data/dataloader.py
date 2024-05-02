@@ -63,11 +63,19 @@ def get_test_loader(batch_size, data_root,dataset, distributed):
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ])
     if dataset == 'CULane':
-        test_dataset = LaneTestDataset(data_root,os.path.join(data_root, 'list/test.txt'),img_transform = img_transforms)
+        test_dataset = LaneTestDataset(data_root,os.path.join(data_root, 'list/test.txt'),
+                                       img_transform = img_transforms)
         cls_num_per_lane = 18
     elif dataset == 'Tusimple':
-        test_dataset = LaneTestDataset(data_root,os.path.join(data_root, 'test.txt'), img_transform = img_transforms)
+        test_dataset = LaneTestDataset(data_root,os.path.join(data_root, 'test.txt'), 
+                                       img_transform = img_transforms)
         cls_num_per_lane = 56
+    elif dataset == 'CurveLanes':
+        test_dataset = LaneTestDataset(data_root,os.path.join(data_root, 'valid/valid_for_culane_style.txt'),
+                                       img_transform = img_transforms) #, crop_size=train_height)
+        cls_num_per_lane = 18 # confirm
+    else:
+        raise NotImplementedError
 
     if distributed:
         sampler = SeqDistributedSampler(test_dataset, shuffle = False)

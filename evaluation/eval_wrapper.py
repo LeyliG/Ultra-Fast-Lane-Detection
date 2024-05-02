@@ -236,3 +236,30 @@ def call_culane_eval(data_dir, exp_name,output_path):
     res_all['res_curve']= read_helper(out6)
     res_all['res_cross']= read_helper(out7)
     return res_all
+
+def call_curvelane_eval(data_dir, exp_name,output_path):
+    if data_dir[-1] != '/':
+        data_dir = data_dir + '/'
+    detect_dir=os.path.join(output_path,exp_name)+'/'
+
+    w_lane=5
+    iou=0.5  # Set iou to 0.3 or 0.5
+    im_w=224
+    im_h=224
+    x_factor = 224 / 2560
+    y_factor = 224 / 1440
+    frame=1
+    list0 = os.path.join(data_dir, 'valid', 'valid_for_culane_style.txt')
+    if not os.path.exists(os.path.join(output_path,'txt')):
+        os.mkdir(os.path.join(output_path,'txt'))
+    out0=os.path.join(output_path,'txt','out0_curve.txt')
+
+    eval_cmd = './evaluation/culane/evaluate'
+    if platform.system() == 'Windows':
+        eval_cmd = eval_cmd.replace('/', os.sep)
+
+    print('./evaluate -s -a %s -d %s -i %s -l %s -w %s -t %s -c %s -r %s -f %s -o %s -x %s -y %s'%(data_dir,detect_dir,data_dir,list0,w_lane,iou,im_w,im_h,frame,out0, x_factor, y_factor))
+    os.system('%s -a %s -d %s -i %s -l %s -w %s -t %s -c %s -r %s -f %s -o %s -x %s -y %s'%(eval_cmd,data_dir,detect_dir,data_dir,list0,w_lane,iou,im_w,im_h,frame,out0, x_factor, y_factor))
+    res_all = {}
+    res_all['res_curve'] = read_helper(out0)
+    return res_all

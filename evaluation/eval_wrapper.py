@@ -50,6 +50,7 @@ def run_test(net, data_root, exp_name, work_dir, griding_num, use_aux,distribute
     if not os.path.exists(output_path) and is_main_process():
         os.mkdir(output_path)
     synchronize()
+ # !!! inspect loader to replace CULane with dataset...
     loader = get_test_loader(batch_size, data_root, 'CULane', distributed)
     # import pdb;pdb.set_trace()
     for i, data in enumerate(dist_tqdm(loader)):

@@ -15,6 +15,7 @@ use_aux=False
 backbone='18'
 sim_loss_w=1.0
 shp_loss_w=0.0
+SIM_DIST_LOSS = "dtw_loss" # "orig_sim_loss"
 note=''
 log_path= '/home/lgarry/CS_projects/ufast_1/curvelanes_logs'
 finetune=None

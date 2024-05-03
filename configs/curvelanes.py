@@ -12,6 +12,7 @@ gamma=0.1
 warmup='linear'
 warmup_iters=695
 use_aux=False
+griding_num = 200
 backbone='18'
 sim_loss_w=1.0
 shp_loss_w=0.0

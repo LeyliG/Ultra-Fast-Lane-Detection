@@ -63,12 +63,59 @@ class ParsingRelationDis(nn.Module):
         pos = torch.sum(x*embedding,dim = 1)
 
         diff_list1 = []
-        for i in range(0,num_rows // 2):
-            diff_list1.append(pos[:,i,:] - pos[:,i+1,:])
+# modify to consider which similarity loss to use
+        if SIM_DIST_LOSS == "dtw_loss":
+            for i in range(0,num_rows // 2):
+                diff_list1.append(dtw_distance(pos[:,i,:] , pos[:,i+1,:]))
+# 
+        elif SIM_DIST_LOSS == "orig_sim_loss":
+            for i in range(0,num_rows // 2):
+                diff_list1.append(pos[:,i,:] - pos[:,i+1,:])
+        else: 
+            print("Check the similarity/distance Loss function")
+            raise NotImplementedError            
 
         loss = 0
         for i in range(len(diff_list1)-1):
             loss += self.l1(diff_list1[i],diff_list1[i+1])
         loss /= len(diff_list1) - 1
         return loss
+    
+    # Dynamic Time Warping (DTW) loss 
+    def dtw_distance(s1, s2):
+        """
+        Calculate the Dynamic Time Warping (DTW) distance between two sequences.
+        s1, s2: Sequences of predictions to compare.
+        """
+        # Initialize cost matrix
+        n, m = len(s1), len(s2)
+        cost = np.zeros((n, m))
+        
+        # Fill the cost matrix
+        for i in range(n):
+            for j in range(m):
+                cost[i, j] = abs(s1[i] - s2[j]) ** 2
+        
+        # Initialize accumulated cost matrix
+        accumulated_cost = np.zeros((n, m))
+        
+        # Fill the accumulated cost matrix
+        accumulated_cost[0, 0] = cost[0, 0]
+        for i in range(1, n):
+            accumulated_cost[i, 0] = accumulated_cost[i - 1, 0] + cost[i, 0]
+        for j in range(1, m):
+            accumulated_cost[0, j] = accumulated_cost[0, j - 1] + cost[0, j]
+        
+        # Calculate the accumulated cost
+        for i in range(1, n):
+            for j in range(1, m):
+                accumulated_cost[i, j] = cost[i, j] + min(accumulated_cost[i - 1, j], 
+                                                        accumulated_cost[i, j - 1], 
+                                                        accumulated_cost[i - 1, j - 1])
+        
+        # Return the DTW distance
+        return np.sqrt(accumulated_cost[-1, -1])
+    
+
+
 

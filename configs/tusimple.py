@@ -25,6 +25,7 @@ use_aux = True
 # LOSS
 sim_loss_w = 1.0
 shp_loss_w = 0.0
+SIM_DIST_LOSS = "dtw_loss" # "orig_sim_loss"
 
 # EXP
 note = ''
